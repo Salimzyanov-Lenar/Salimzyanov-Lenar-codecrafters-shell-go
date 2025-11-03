@@ -44,6 +44,10 @@ func checkPathInSystem(commands []string) bool {
 	// Type handler for check program in system
 	paths := strings.Split(os.Getenv("PATH"), ":")
 
+	for i, j := 0, len(paths)-1; i < j; i, j = i+1, j-1 {
+		paths[i], paths[j] = paths[j], paths[i]
+	}
+
 	for _, path := range paths {
 		filePath := filepath.Join(path, strings.TrimSpace(commands[1]))
 		if _, err := os.Stat(filePath); err == nil {
