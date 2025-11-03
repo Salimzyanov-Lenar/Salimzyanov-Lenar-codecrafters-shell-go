@@ -11,28 +11,6 @@ import (
 var _ = fmt.Fprint
 var _ = os.Stdout
 
-func handleExit(command string) bool {
-	parts := strings.Fields(command)
-
-	if len(parts) != 2 {
-		return false
-	}
-
-	cmd := parts[0]
-	statusCode := parts[1]
-
-	if cmd != "exit" {
-		return false
-	}
-
-	if statusCode == "0" {
-		return true
-	}
-
-	return false
-
-}
-
 func main() {
 	// REPL
 	for {
