@@ -11,21 +11,21 @@ import (
 var _ = fmt.Fprint
 var _ = os.Stdout
 
-func handle_exit(command string) bool {
-	splited := strings.Fields(command)
+func handleExit(command string) bool {
+	parts := strings.Fields(command)
 
-	if len(splited) != 2 {
+	if len(parts) != 2 {
 		return false
 	}
 
-	cmd := splited[0]
-	status_code := splited[1]
+	cmd := parts[0]
+	statusCode := parts[1]
 
 	if cmd != "exit" {
 		return false
 	}
 
-	if status_code == "0" {
+	if statusCode == "0" {
 		return true
 	}
 
@@ -39,7 +39,7 @@ func main() {
 		fmt.Fprint(os.Stdout, "$ ")
 		command, _ := bufio.NewReader(os.Stdin).ReadString('\n')
 
-		if handle_exit(command) {
+		if handleExit(command) {
 			break
 		}
 
