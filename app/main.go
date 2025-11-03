@@ -42,17 +42,19 @@ func echo(commands []string) {
 
 func checkPathInSystem(commands []string) bool {
 	// Type handler for check program in system
-	paths := os.Getenv("PATH")
+	paths := filepath.SplitList(os.Getenv("PATH"))
 
 	command := strings.TrimSpace(commands[1])
 
-	for _, path := range strings.Split(paths, ":") {
-		file := filepath.Join(path, command)
+	for i := len(paths) - 1; i >= 0; i-- {
+		dir := paths[i]
+		file := filepath.Join(dir, command)
 		if _, err := os.Stat(file); err == nil {
 			fmt.Fprintf(os.Stdout, "%s is %s\n", command, file)
 			return true
 		}
 	}
+
 	return false
 }
 
