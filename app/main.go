@@ -47,10 +47,6 @@ func checkPathInSystem(commands []string) bool {
 	for _, path := range paths {
 		filePath := filepath.Join(path, strings.TrimSpace(commands[1]))
 		if _, err := os.Stat(filePath); err == nil {
-			mode := filePath.Mode()
-			if mode&0111 != 0 {
-				continue
-			}
 			command := strings.TrimSuffix(commands[1], "\n")
 			fmt.Fprintf(os.Stdout, "%s is %s\n", command, filePath)
 			return true
