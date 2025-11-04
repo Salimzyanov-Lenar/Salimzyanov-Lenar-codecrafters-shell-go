@@ -73,9 +73,7 @@ func parseInput(input string) []string {
 			}
 			escaped = false
 
-		case c == '\\' && !inDoubleQuote && !inSingleQuote:
-			escaped = true
-		case c == '\\' && inDoubleQuote:
+		case c == '\\' && !inSingleQuote:
 			escaped = true
 
 		case c == '\'' && !inDoubleQuote:
