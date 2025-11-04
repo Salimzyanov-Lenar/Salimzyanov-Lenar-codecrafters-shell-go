@@ -81,6 +81,12 @@ func cdHandler(commands []string) {
 		return
 	}
 
+	if strings.TrimSpace(commands[1]) == "~" {
+		homePath := os.Getenv("HOME")
+		os.Chdir(homePath)
+		return
+	}
+
 	absolutePath := strings.TrimSpace(commands[1])
 	err := os.Chdir(absolutePath)
 	if err != nil {
