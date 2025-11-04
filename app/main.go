@@ -60,10 +60,24 @@ func parseInput(input string) []string {
 	for _, c := range input {
 		switch {
 		case escaped:
-			current.WriteRune(c)
+			if inDoubleQuote {
+				switch c {
+				case '"', '\\':
+					current.WriteRune(c)
+				default:
+					current.WriteRune('\\')
+					current.WriteRune(c)
+				}
+			} else {
+				current.WriteRune(c)
+			}
 			escaped = false
+
 		case c == '\\' && !inDoubleQuote && !inSingleQuote:
 			escaped = true
+		case c == '\\' && inDoubleQuote:
+			escaped = true
+
 		case c == '\'' && !inDoubleQuote:
 			inSingleQuote = !inSingleQuote
 		case c == '"' && !inSingleQuote:
