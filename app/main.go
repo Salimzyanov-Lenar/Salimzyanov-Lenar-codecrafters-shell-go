@@ -31,15 +31,11 @@ func main() {
 			os.Exit(1)
 		}
 
-		// if strings.TrimSpace(input) == "" {
-		// 	continue
-		// }
-
+		// Parse input
 		commands := parseInput(input)
-		// Output
-		// commands := strings.Split(input, " ")
 		handler, ok := commandHandlers[strings.TrimSpace(commands[0])]
 
+		// Output
 		if ok {
 			handler(commands) // Builtin handler
 		} else if anotherProgramHandler(commands) { // Try to run program in system
@@ -51,59 +47,39 @@ func main() {
 	}
 }
 
-// func splitWithQuotes(s string) []string {
-// 	var result []string
-// 	var current string
-// 	inQuote := false
-
-// 	for i := 0; i < len(s); i++ {
-// 		if s[i] == '\'' {
-// 			inQuote = !inQuote
-// 		} else if s[i] == ' ' && !inQuote {
-// 			if current != "" {
-// 				result = append(result, current)
-// 				current = ""
-// 			}
-// 		} else {
-// 			current += string(s[i])
-// 		}
-// 	}
-// 	if current != "" {
-// 		result = append(result, current)
-// 	}
-// 	return result
-// }
-
 func parseInput(input string) []string {
-	var parts []string
-	var currentPart strings.Builder
-	var quoteChar rune = 0
+	var current strings.Builder
+	parts := []string{}
+	inSingleQuote := false
+	inDoubleQuote := false
+	escaped := false
 
+	// Trim trailing newline from ReadString
 	input = strings.TrimSuffix(input, "\n")
 
-	for _, r := range input {
+	for _, c := range input {
 		switch {
-		case quoteChar != 0:
-			if r == quoteChar {
-				quoteChar = 0
-			} else {
-				currentPart.WriteRune(r)
+		case escaped:
+			current.WriteRune(c)
+			escaped = false
+		case c == '\\' && !inDoubleQuote && !inSingleQuote:
+			escaped = true
+		case c == '\'' && !inDoubleQuote:
+			inSingleQuote = !inSingleQuote
+		case c == '"' && !inSingleQuote:
+			inDoubleQuote = !inDoubleQuote
+		case unicode.IsSpace(c) && !inSingleQuote && !inDoubleQuote:
+			if current.Len() > 0 {
+				parts = append(parts, current.String())
+				current.Reset()
 			}
-		case r == '\'' || r == '"':
-			quoteChar = r
 
-		case unicode.IsSpace(r):
-			if currentPart.Len() > 0 {
-				parts = append(parts, currentPart.String())
-				currentPart.Reset()
-			}
 		default:
-			currentPart.WriteRune(r)
+			current.WriteRune(c)
 		}
 	}
-
-	if currentPart.Len() > 0 {
-		parts = append(parts, currentPart.String())
+	if current.Len() > 0 {
+		parts = append(parts, current.String())
 	}
 	return parts
 }
