@@ -13,12 +13,12 @@ var commandHandlers map[string]func([]string)
 // Initialize with built in function
 func init() {
 	commandHandlers = map[string]func([]string){
-		"echo":     echoHandler,
-		"exit":     exitHandler,
-		"type":     typeHandler,
-		"pwd":      pwdHandler,
-		"cd":       cdHandler,
-		"shellest": shellestHandler,
+		"echo": echoHandler,
+		"exit": exitHandler,
+		"type": typeHandler,
+		"pwd":  pwdHandler,
+		"cd":   cdHandler,
+		// "shellest": shellestHandler,
 	}
 }
 

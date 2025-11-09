@@ -116,6 +116,6 @@ func externalProgramHandler(commands []string) bool {
 	return false
 }
 
-func shellestHandler(commands []string) bool {
-	commands :=
-}
+// func shellestHandler(commands []string) bool {
+// 	commands :=
+// }
