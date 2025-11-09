@@ -95,18 +95,17 @@ func cdHandler(commands []string) {
 // Case: program not builtin, find it in PATH dirs
 func externalProgramHandler(commands []string) bool {
 	command := strings.TrimSpace(commands[0])
-	program_exists, filePath := checkFileExistsInSystem(command)
-
-	redirectIndex, redirect_exists := findRedirectOutputIndex(commands)
+	programExists, filePath := checkFileExistsInSystem(command)
+	redirectIndex, redirectExists, redirectType := findRedirectOutputIndex(commands)
 
 	args := []string{}
 	if len(commands) > 1 {
 		args = commands[1:]
 	}
 
-	if program_exists {
-		if redirect_exists {
-			runExternalRedirected(filePath, command, redirectIndex, args)
+	if programExists {
+		if redirectExists {
+			runExternalRedirected(filePath, command, redirectIndex, redirectType, args)
 		} else {
 			runExternal(filePath, command, args)
 		}

@@ -31,14 +31,14 @@ func runExternal(path string, command string, args []string) {
 	}
 }
 
-func runExternalRedirected(path string, command string, redirectIndex int, args []string) {
+func runExternalRedirected(path string, command string, redirectIndex int, redirectType RedirectType, args []string) {
 	// For not builtin commands
-	cmdArgs := args[:redirectIndex-1]
-
 	if redirectIndex >= len(args) {
-		fmt.Fprintln(os.Stderr, "syntax error: missing file after '>'")
+		fmt.Fprintln(os.Stderr, "syntax error: missing file after redirection")
 		return
 	}
+
+	cmdArgs := args[:redirectIndex-1]
 	filename := args[redirectIndex]
 
 	file, err := os.Create(filename)
@@ -51,8 +51,14 @@ func runExternalRedirected(path string, command string, redirectIndex int, args 
 	cmd := exec.Command(path, cmdArgs...)
 	cmd.Args = append([]string{command}, cmdArgs...)
 	cmd.Stdin = os.Stdin
-	cmd.Stdout = file
-	cmd.Stderr = os.Stdout
+
+	if redirectType == RedirectStdout {
+		cmd.Stdout = file
+		cmd.Stderr = os.Stderr
+	} else {
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = file
+	}
 
 	if err := cmd.Run(); err != nil {
 		if _, ok := err.(*exec.ExitError); ok {
@@ -66,7 +72,7 @@ func runBuiltIn(commands []string, handler func([]string)) {
 	// For builtin commands
 	// - if have redirect flag - will redirect output
 	// - if don't have redirect flag - will write to default stdout
-	redirectIndex, exists := findRedirectOutputIndex(commands)
+	redirectIndex, exists, _ := findRedirectOutputIndex(commands)
 	if !exists {
 		handler(commands)
 		return

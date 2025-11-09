@@ -1,15 +1,23 @@
 package main
 
-// package for utils
+type RedirectType int
 
-func findRedirectOutputIndex(commands []string) (int, bool) {
+const (
+	RedirectStdout RedirectType = iota
+	RedirectStderr
+)
+
+func findRedirectOutputIndex(commands []string) (int, bool, RedirectType) {
 	// - allow to find redirect 'flag' index
-	redirectIndex := -1
 	for i, p := range commands {
-		if p == ">" || p == "1>" {
-			redirectIndex = i
-			return redirectIndex, true
+		switch p {
+		case ">", "1>":
+			redirectIndex := i
+			return redirectIndex, true, RedirectStdout
+		case "2>":
+			redirectIndex := i
+			return redirectIndex, true, RedirectStderr
 		}
 	}
-	return redirectIndex, false
+	return -1, false, RedirectStdout
 }
