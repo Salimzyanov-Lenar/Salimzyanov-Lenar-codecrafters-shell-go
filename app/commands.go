@@ -26,11 +26,27 @@ func exitHandler(commands []string) {
 
 // Case: echo <some_text> -> print <some_text> in terminal
 func echoHandler(commands []string) {
-	runBuiltIn(commands, func(cmds []string) {
-		if len(cmds) >= 1 {
-			fmt.Fprintln(os.Stdout, strings.Join(cmds[1:], " "))
-		}
-	})
+	redirectIndex, haveRedirect, RedirectType := findRedirectOutputIndex(commands)
+
+	if !haveRedirect {
+		runBuiltIn(commands, func(cmds []string) {
+			if len(cmds) >= 1 {
+				fmt.Fprintln(os.Stdout, strings.Join(cmds[1:], " "))
+			}
+		})
+	}
+	if haveRedirect && RedirectType == RedirectStdout {
+		runBuiltIn(commands, func(cmds []string) {
+			filename := commands[redirectIndex+1]
+			file, err := os.Create(filename)
+			if err != nil {
+				fmt.Fprintln(os.Stdout, "error creating file:", err)
+			}
+			if len(cmds) >= 1 {
+				fmt.Fprintln(file, strings.Join(cmds[1:redirectIndex], " "))
+			}
+		})
+	}
 }
 
 // Case: type <program_name> -> show path or say that builtin

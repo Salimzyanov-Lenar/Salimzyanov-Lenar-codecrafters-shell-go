@@ -27,7 +27,6 @@ func runExternal(path string, command string, args []string) {
 	cmd.Stderr = os.Stderr
 	err := cmd.Run()
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
 	}
 }
 
@@ -38,7 +37,6 @@ func runExternalRedirected(path string, command string, redirectIndex int, redir
 		return
 	}
 
-	// cmdArgs := args[:redirectIndex-1]
 	filename := args[redirectIndex]
 
 	file, err := os.Create(filename)
@@ -48,24 +46,25 @@ func runExternalRedirected(path string, command string, redirectIndex int, redir
 	}
 	defer file.Close()
 
-	cmdArgs := args[:redirectIndex]
+	cmdArgs := args[:redirectIndex-1] // everything before `>`
 	cmd := exec.Command(path, cmdArgs...)
-	// cmd.Args = append([]string{command}, cmdArgs...)
+	cmd.Args = append([]string{command}, cmdArgs...)
 	cmd.Stdin = os.Stdin
+	cmd.Stderr = os.Stderr
+	cmd.Stdout = os.Stdout
 
 	if redirectType == RedirectStdout {
 		cmd.Stdout = file
 		cmd.Stderr = os.Stderr
-	} else {
+	}
+	if redirectType == RedirectStderr {
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = file
 	}
 
-	if err := cmd.Run(); err != nil {
-		if _, ok := err.(*exec.ExitError); ok {
-			return
-		}
-		fmt.Fprintln(os.Stderr, err)
+	err = cmd.Run()
+	if err != nil {
+
 	}
 }
 
